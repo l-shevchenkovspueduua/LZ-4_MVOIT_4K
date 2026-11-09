@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="uk" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Компетентнісний Тренажер: Методика викладання Інформатики в ЗП(ПТ)О</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gemini: {
+                            bg: '#0f131a',
+                            card: '#1a1f2c',
+                            border: '#2e364a',
+                            accent: '#10b981',
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            darkText: '#9ca3af'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0e14;
+            color: #e5e7eb;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        .glass-panel {
+            background: rgba(26, 31, 44, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col custom-scrollbar">
+
+    <!-- Top Header Navigation -->
+    <header class="glass-panel sticky top-0 z-50 border-b border-gray-800 px-4 py-3 shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-gray-900 font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-emerald-950 text-emerald-400 border border-emerald-700/50 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                            ВЕБІНАР D | СТАРША ПРОФІЛЬНА ШКОЛА • ДСП(ПТ)О
+                        </span>
+                    </div>
+                    <h1 class="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        КОМПЕТЕНТНІСНИЙ ТРЕНАЖЕР: МЕТОДИКА ІНФОРМАТИКИ В ЗП(ПТ)О
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Header Action Buttons -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleModal('hintsModal')" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium flex items-center space-x-2 transition">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>Компетентнісні підказки</span>
+                </button>
+                <button onclick="exportJSON()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium flex items-center space-x-2 transition">
+                    <i class="fa-solid fa-file-code"></i>
+                    <span>Експорт JSON</span>
+                </button>
+                <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-700 text-purple-400 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium flex items-center space-x-2 transition">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Друк / PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- Mode Bar & Live Session Timer -->
+        <div class="glass-panel p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 border border-gray-800 shadow-md">
+            <div class="flex items-center space-x-2">
+                <span class="text-xs uppercase font-bold text-gray-400 mr-2">Режим:</span>
+                <button onclick="setMode('group')" id="mode-group" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-sm transition">
+                    <i class="fa-solid fa-users"></i>
+                    <span>20 хв (Групи)</span>
+                </button>
+                <button onclick="setMode('pitch')" id="mode-pitch" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-2 transition">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>8 хв (Пітчинг)</span>
+                </button>
+                <button onclick="setMode('reflect')" id="mode-reflect" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-2 transition">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>2 хв (Рефлексія)</span>
+                </button>
+            </div>
+
+            <!-- Timer Widget -->
+            <div class="flex items-center space-x-4 bg-gray-900/80 px-4 py-2 rounded-xl border border-gray-700">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-regular fa-clock text-emerald-400 animate-pulse"></i>
+                    <span id="timer-display" class="font-mono text-xl font-bold text-emerald-400">20:00</span>
+                    <span class="text-xs text-gray-400 hidden sm:inline">(Основний практикум у групах)</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <button onclick="toggleTimer()" id="timer-toggle-btn" class="p-1.5 hover:bg-gray-800 rounded-lg text-gray-300 transition">
+                        <i class="fa-solid fa-pause" id="timer-icon"></i>
+                    </button>
+                    <button onclick="resetTimer()" class="p-1.5 hover:bg-gray-800 rounded-lg text-gray-300 transition">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 0: WORK TRACK / PROFESSION SELECTOR -->
+        <section class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">КРОК 0. КОНТЕКСТ ДІЯЛЬНОСТІ</span>
+                    <h2 class="text-lg md:text-xl font-bold text-white">Оберіть кейс для своєї проєктної команди / робітничої професії</h2>
+                </div>
+                <span class="text-xs text-gray-400 hidden md:block">4 професійні напрями СП(ПТ)О</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="profession-cards">
+                <!-- Group 1: Auto -->
+                <div onclick="selectGroup('group1')" id="card-group1" class="profession-card glass-panel p-4 rounded-2xl border-2 border-emerald-500 cursor-pointer hover:border-emerald-400 transition relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">ГРУПА 1</span>
+                        <span class="bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-wrench mr-1"></i> Транспорт</span>
+                    </div>
+                    <h3 class="font-bold text-white text-sm mb-1 group-hover:text-emerald-300 transition">Інженерія та автомеханіка</h3>
+                    <p class="text-xs text-gray-400 mb-3">Курс: "Табличний процесор для діагностики зносу деталей та аналізу паливних витрат".</p>
+                    <div class="text-[11px] text-emerald-400/80 font-mono">СП(ПТ)О 8322.2 • Фізико-технічні основи</div>
+                    <div class="check-badge absolute top-3 right-3 text-emerald-400 text-sm hidden"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+
+                <!-- Group 2: Cook -->
+                <div onclick="selectGroup('group2')" id="card-group2" class="profession-card glass-panel p-4 rounded-2xl border-2 border-transparent hover:border-gray-600 cursor-pointer transition relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">ГРУПА 2</span>
+                        <span class="bg-blue-950/80 border border-blue-800 text-blue-300 text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-utensils mr-1"></i> Харчування</span>
+                    </div>
+                    <h3 class="font-bold text-white text-sm mb-1 group-hover:text-blue-300 transition">Хімія кулінарної ферментації & Кухар</h3>
+                    <p class="text-xs text-gray-400 mb-3">Курс: "Калькуляційні карти меню, динаміка pH та розрахунок харчової цінності в Excel".</p>
+                    <div class="text-[11px] text-blue-400/80 font-mono">СП(ПТ)О 5122.1 • Дослідження біосистем</div>
+                    <div class="check-badge absolute top-3 right-3 text-blue-400 text-sm hidden"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+
+                <!-- Group 3: Welder/Textile -->
+                <div onclick="selectGroup('group3')" id="card-group3" class="profession-card glass-panel p-4 rounded-2xl border-2 border-transparent hover:border-gray-600 cursor-pointer transition relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">ГРУПА 3</span>
+                        <span class="bg-amber-950/80 border border-amber-800 text-amber-300 text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-volcano mr-1"></i> Будівництво/САПР</span>
+                    </div>
+                    <h3 class="font-bold text-white text-sm mb-1 group-hover:text-amber-300 transition">Електрогазозварник / САПР 3D</h3>
+                    <p class="text-xs text-gray-400 mb-3">Курс: "3D-моделювання металоконструкцій та підрахунок міцності швів".</p>
+                    <div class="text-[11px] text-amber-400/80 font-mono">СП(ПТ)О 7212.2 • Критерії якості</div>
+                    <div class="check-badge absolute top-3 right-3 text-amber-400 text-sm hidden"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+
+                <!-- Group 4: Operator -->
+                <div onclick="selectGroup('group4')" id="card-group4" class="profession-card glass-panel p-4 rounded-2xl border-2 border-transparent hover:border-gray-600 cursor-pointer transition relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">ГРУПА 4</span>
+                        <span class="bg-purple-950/80 border border-purple-800 text-purple-300 text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-laptop-code mr-1"></i> Послуги & IT</span>
+                    </div>
+                    <h3 class="font-bold text-white text-sm mb-1 group-hover:text-purple-300 transition">Оператор з обробки інформації</h3>
+                    <p class="text-xs text-gray-400 mb-3">Курс: "СУБД, вебресурси та хмарний документообіг для офісних систем".</p>
+                    <div class="text-[11px] text-purple-400/80 font-mono">СП(ПТ)О 4112.0 • Циркулярний хмарний потік</div>
+                    <div class="check-badge absolute top-3 right-3 text-purple-400 text-sm hidden"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN PEDAGOGICAL WORKFLOW & STRESS CARDS GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left & Middle Column: Steps 1-5 Form Controls -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- STEP 1: TRIAD OF PEDAGOGICAL DESIGN -->
+                <div class="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">1</span>
+                            ТРІАДА КОМПЕТЕНТНІСНОГО ПОСТУПУ (Проєктування уроку ІТ)
+                        </h3>
+                        <span id="active-group-tag" class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
+                            Група 1: Автомеханік
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <!-- Selector 1 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">1. Форма та метод навчання</label>
+                            <select id="select-method" onchange="updateLessonState()" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-emerald-500">
+                                <option value="Бінарний урок + Кейс-метод">Бінарний урок + Кейс-метод</option>
+                                <option value="ЛПР за Інструкційно-технологічною карткою">ЛПР за Інструкційно-технологічною карткою</option>
+                                <option value="Симуляційно-практичний інтенсив">Симуляційно-практичний інтенсив</option>
+                                <option value="Мікропроєктний виробничий спринт">Мікропроєктний виробничий спринт</option>
+                            </select>
+                        </div>
+
+                        <!-- Selector 2 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">2. Інтеграція зі спецдисципліною</label>
+                            <input type="text" id="input-spec" oninput="updateLessonState()" value="Спецтехнологія та Виробниче навчання" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-emerald-500">
+                        </div>
+
+                        <!-- Selector 3 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">3. Цифровий інструмент / ПЗ</label>
+                            <select id="select-tool" onchange="updateLessonState()" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-emerald-500">
+                                <option value="MS Excel / Таблиці Google">MS Excel / Таблиці Google</option>
+                                <option value="Wordwall / LearningApps (Інтерактив)">Wordwall / LearningApps (Інтерактив)</option>
+                                <option value="AutoCAD / 3D-Компас (САПР)">AutoCAD / 3D-Компас (САПР)</option>
+                                <option value="Canva / Figma (Візуалізація)">Canva / Figma (Візуалізація)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARDS 4 & 5: FACT-CHECKING & STRESS ADAPTATION -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- Card 4 -->
+                    <div class="glass-panel p-4 rounded-2xl border border-gray-800 space-y-2">
+                        <div class="flex items-center space-x-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                            <i class="fa-solid fa-magnifying-glass font-bold"></i>
+                            <span>4. НАУКОВИЙ ФАКТЧЕКІНГ / АНТИФЕЙК</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Який антинауковий міф, маркетингову маніпуляцію чи хибне уявлення спростовують у-ні на основі фізико-хімічних даних чи ІТ-розрахунків?</p>
+                        <textarea id="text-factcheck" oninput="updateLessonState()" rows="3" class="w-full bg-gray-900/90 border border-gray-700 rounded-xl p-2.5 text-xs text-gray-200 focus:outline-none focus:border-amber-500 custom-scrollbar" placeholder="Наприклад: Міф про те, що витрата пального не залежить від аеродинамічного опору..."></textarea>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="glass-panel p-4 rounded-2xl border border-gray-800 space-y-2">
+                        <div class="flex items-center space-x-2 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>5. КОМПЕТЕНТНІСНА АДАПТАЦІЯ ДО СТРЕС-ВИКЛИКУ</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Як саме проявилася компетентність під час розв'язання неочікуваного форс-мажору (зміна матеріалу, симуляція, перерозподіл меж)?</p>
+                        <textarea id="text-adaptation" oninput="updateLessonState()" rows="3" class="w-full bg-gray-900/90 border border-gray-700 rounded-xl p-2.5 text-xs text-gray-200 focus:outline-none focus:border-blue-500 custom-scrollbar" placeholder="Наприклад: Перехід на офлайн картки-шаблони та ручні розрахунки коефіцієнтів..."></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: STRESS DECK & QUICK REFLECTION -->
+            <div class="space-y-6">
+
+                <!-- STRESS-CARDS DECK -->
+                <div class="glass-panel p-4 rounded-2xl border border-gray-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>КОЛОДА СТРЕС-КАРТОК (ФОРС-МАЖОР)</span>
+                        </h3>
+                        <span class="text-[10px] text-gray-500">Картика <span id="card-num">1</span>/4</span>
+                    </div>
+
+                    <!-- Selected Stress Card Display -->
+                    <div id="stress-card-box" class="bg-gradient-to-br from-red-950/40 to-gray-900 p-3.5 rounded-xl border border-red-800/40 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span id="stress-title" class="text-xs font-bold text-red-300">Блекаут / знеструмлення майстерні</span>
+                            <span class="text-[9px] bg-red-900/60 text-red-200 px-2 py-0.5 rounded">Форс-мажор</span>
+                        </div>
+                        <p id="stress-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                            Під час лабораторно-практичної роботи вимкнули світло та ПК. Як зберегти виконання інструкційної картки без доступу до електромережі?
+                        </p>
+                    </div>
+
+                    <!-- Stress Selector Buttons -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="pickStressCard(0)" class="text-left text-[11px] p-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 transition">
+                            ⚡ 1. Блекаут ПК
+                        </button>
+                        <button onclick="pickStressCard(1)" class="text-left text-[11px] p-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 transition">
+                            📉 2. Низький вхід ІТ
+                        </button>
+                        <button onclick="pickStressCard(2)" class="text-left text-[11px] p-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 transition">
+                            💻 3. Відсутнє спец ПЗ
+                        </button>
+                        <button onclick="pickStressCard(3)" class="text-left text-[11px] p-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 transition">
+                            ⏳ 4. Скорочення часу
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 6: GALLERY OF PEDAGOGICAL SOLUTIONS (REFLECTION) -->
+                <div class="glass-panel p-4 rounded-2xl border border-emerald-500/30 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-comments"></i>
+                            <span>ГАЛЕРЕЯ ПЕДАГОГІЧНИХ РІШЕНЬ</span>
+                        </h3>
+                        <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded">2 хв рефлексії</span>
+                    </div>
+
+                    <!-- Input 1 -->
+                    <div>
+                        <label class="block text-[11px] text-gray-400 mb-1">Який інструмент дослідження берете?</label>
+                        <input type="text" id="ref-tool" oninput="updateReflections()" placeholder="напр.: інженерний Excel-калькулятор зносу" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 focus:outline-none focus:border-emerald-500">
+                    </div>
+
+                    <!-- Input 2 -->
+                    <div>
+                        <label class="block text-[11px] text-gray-400 mb-1">Для чого?</label>
+                        <input type="text" id="ref-why" oninput="updateReflections()" placeholder="напр.: доказово досліджувати фізико-хімічні процеси" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 focus:outline-none focus:border-emerald-500">
+                    </div>
+
+                    <!-- Phrase Result Box -->
+                    <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 text-[11px] text-emerald-300 font-mono italic leading-relaxed" id="phrase-box">
+                        «Я беру з кейсу Групи 1 рішення про інструмент інженерний Excel-калькулятор, щоб на уроках технологій мої учні могли доказово обґрунтовувати надійність рішень.»
+                    </div>
+
+                    <!-- Copy Button -->
+                    <button onclick="copyZoomPhrase()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-gray-950 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center space-x-2 transition shadow-lg">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Скопіювати фразу для Zoom / Moodle</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TIMELINE / PROGRESS SUMMARY BAR -->
+        <div class="glass-panel p-4 rounded-2xl border border-gray-800 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="text-xs font-bold text-gray-400 uppercase">Структура таймінгу:</div>
+                <div class="flex items-center space-x-2 text-xs">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                    <span class="text-gray-300">00-60 с: Актуалізація та Кейс</span>
+                </div>
+                <div class="flex items-center space-x-2 text-xs">
+                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+                    <span class="text-gray-300">60-90 с: Науковий антифейк</span>
+                </div>
+                <div class="flex items-center space-x-2 text-xs">
+                    <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span>
+                    <span class="text-gray-300">90-120 с: Адаптація до стресу</span>
+                </div>
+            </div>
+
+            <div class="text-xs text-emerald-400 font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-check-double"></i>
+                <span>Модуль готовій до інтеграції в Moodle!</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- HINTS MODAL -->
+    <div id="hintsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-2xl w-full p-6 rounded-2xl border border-emerald-500/40 space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    Компетентнісні підказки з методики ІТ в ЗП(ПТ)О
+                </h3>
+                <button onclick="toggleModal('hintsModal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-gray-300 leading-relaxed">
+                <p><strong>1. Міжпредметна інтеграція:</strong> Завжди поєднуйте вивчення ІТ з темами з СП(ПТ)О. Абстрактні таблиці заступайте фаховими розрахунками (калькуляції кухаря, діагностика автомеханіка).</p>
+                <p><strong>2. Три рівні складності:</strong> Надавайте в інструктивній картці 1 рівень (репродуктивний з алгоритмом), 2 рівень (професійне застосування) та 3 рівень (творчий/форс-мажорний).</p>
+                <p><strong>3. Стійкість до блекауту:</strong> Розробляйте офлайн-картки самоконтролю, щоб учні могли відпрацьовувати алгоритми діяльності навіть при знеструмленні.</p>
+            </div>
+            <div class="text-right pt-2">
+                <button onclick="toggleModal('hintsModal')" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-1.5 rounded-xl text-xs">Зрозуміло</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-emerald-600 text-gray-950 font-bold px-4 py-2.5 rounded-xl text-xs shadow-2xl flex items-center space-x-2 transition opacity-0 pointer-events-none z-50">
+        <i class="fa-solid fa-circle-check text-base"></i>
+        <span id="toast-msg">Повідомлення скопійовано!</span>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Data State
+        const groupsData = {
+            group1: {
+                title: "Група 1: Автомеханік / Інженерія",
+                badge: "Транспорт",
+                spec: "Спецтехнологія та Двигуни ВН",
+                factcheck: "Міф про те, що витрата пального лінійно залежить тільки від об'єму двигуна. ІТ-симуляція показує вплив тиску в шинах та аеродинаміки.",
+                adaptation: "У разі знеструмлення учні використовують друковані номограми та формульні карти для вимірювання фізичних величин.",
+                refTool: "інженерний Excel-калькулятор зносу деталей",
+                refWhy: "доказово обґрунтовувати періодичність техобслуговування"
+            },
+            group2: {
+                title: "Група 2: Кухар / Біотехнології",
+                badge: "Харчування",
+                spec: "Кулінарія та Технологія приготування",
+                factcheck: "Міф про постійну швидкість ферментації тіста. Табличний розрахунок в Excel показує залежність від умісту цукру та вологості.",
+                adaptation: "Перехід на ручні таблиці калькуляції меню та картки виходу готової продукції.",
+                refTool: "Excel-шаблон калькуляційних карт меню",
+                refWhy: "точно розраховувати харчову цінність та собівартість страви"
+            },
+            group3: {
+                title: "Група 3: Електрогазозварник / САПР",
+                badge: "Будівництво",
+                spec: "Спецтехнологія зварювання та Матеріалознавство",
+                factcheck: "Міф про те, що товщина зварного шва завжди пропорційна міцності. 3D-симуляція навантаження спростовує цей стереотип.",
+                adaptation: "Використання паперових 2D-шаблонів та вимірювальних лінійок для перевірки геометрії швів.",
+                refTool: "3D-симулятор та віртуальну САПР",
+                refWhy: "проектувати надійні металоконструкції без перевитрати матеріалу"
+            },
+            group4: {
+                title: "Група 4: Оператор з обробки інформації",
+                badge: "Послуги & IT",
+                spec: "Офісні системи та Документообіг",
+                factcheck: "Помилкове уявлення, що хмарні СУБД менш безпечні за локальні файли. Аналіз шифрування доводить зворотне.",
+                adaptation: "Перехід на локальні офлайн-формати баз даних Access або картки ведення реєстрів.",
+                refTool: "реляційну СУБД та хмарний реєстр",
+                refWhy: "забезпечувати автоматизацію діловодства на підприємстві"
+            }
+        };
+
+        const stressCards = [
+            {
+                title: "Блекаут / знеструмлення майстерні",
+                desc: "Під час лабораторно-практичної роботи вимкнули світло та ПК. Як зберегти виконання інструкційної картки без доступу до електромережі?"
+            },
+            {
+                title: "Низький рівень вхідної цифрової грамотності",
+                desc: "Учні не вміють вводити формули у табличному процесорі. Як адаптувати завдання під 1-й (базовий) рівень складності?"
+            },
+            {
+                title: "Відсутність спеціалізованого ПЗ на робочих місцях",
+                desc: "На комп'ютерах відсутні платні САПР чи розрахункові комплекси. Як використати безкоштовне або хмарне аналогічне ПЗ?"
+            },
+            {
+                title: "Скорочення тривалості заняття на 50%",
+                desc: "Повітряна тривога скоротила урок до 20 хвилин. Які елементи залишити в аудиторії, а що перенести на самостійну робота (СР)?"
+            }
+        ];
+
+        let selectedGroupKey = 'group1';
+        let timerSeconds = 1200; // 20 mins
+        let timerInterval = null;
+        let isTimerRunning = false;
+
+        // Init function
+        window.onload = function() {
+            selectGroup('group1');
+            startTimer();
+        };
+
+        // Select Profession Group
+        function selectGroup(key) {
+            selectedGroupKey = key;
+            const data = groupsData[key];
+
+            // Update UI Cards highlight
+            document.querySelectorAll('.profession-card').forEach(c => {
+                c.classList.remove('border-emerald-500', 'border-blue-500', 'border-amber-500', 'border-purple-500');
+                c.classList.add('border-transparent');
+                c.querySelector('.check-badge').classList.add('hidden');
+            });
+
+            const activeCard = document.getElementById(`card-${key}`);
+            activeCard.classList.remove('border-transparent');
+            activeCard.classList.add('border-emerald-500');
+            activeCard.querySelector('.check-badge').classList.remove('hidden');
+
+            // Set tag in step 1
+            document.getElementById('active-group-tag').innerText = data.title;
+            document.getElementById('input-spec').value = data.spec;
+            document.getElementById('text-factcheck').value = data.factcheck;
+            document.getElementById('text-adaptation').value = data.adaptation;
+
+            document.getElementById('ref-tool').value = data.refTool;
+            document.getElementById('ref-why').value = data.refWhy;
+
+            updateReflections();
+        }
+
+        // Stress Card Selection
+        function pickStressCard(index) {
+            const card = stressCards[index];
+            document.getElementById('card-num').innerText = index + 1;
+            document.getElementById('stress-title').innerText = card.title;
+            document.getElementById('stress-desc').innerText = card.desc;
+        }
+
+        // Reflection Phrase Builder
+        function updateReflections() {
+            const data = groupsData[selectedGroupKey];
+            const tool = document.getElementById('ref-tool').value || 'інструмент';
+            const why = document.getElementById('ref-why').value || 'розв\'язувати завдання';
+
+            const phrase = `«Я беру з кейсу ${data.title} рішення про інструмент ${tool}, щоб на уроках технологій мої учні могли доказово ${why}.»`;
+            document.getElementById('phrase-box').innerText = phrase;
+        }
+
+        function updateLessonState() {
+            updateReflections();
+        }
+
+        // Copy Phrase to Clipboard
+        function copyZoomPhrase() {
+            const text = document.getElementById('phrase-box').innerText;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            showToast('Фразу для Zoom / Moodle скопійовано!');
+        }
+
+        // Timer Functions
+        function startTimer() {
+            if(isTimerRunning) return;
+            isTimerRunning = true;
+            document.getElementById('timer-icon').className = 'fa-solid fa-pause';
+            timerInterval = setInterval(() => {
+                if(timerSeconds > 0) {
+                    timerSeconds--;
+                    renderTimer();
+                } else {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                }
+            }, 1000);
+        }
+
+        function toggleTimer() {
+            if(isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                document.getElementById('timer-icon').className = 'fa-solid fa-play';
+            } else {
+                startTimer();
+            }
+        }
+
+        function resetTimer() {
+            timerSeconds = 1200;
+            renderTimer();
+        }
+
+        function renderTimer() {
+            const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+            const s = (timerSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+        }
+
+        function setMode(mode) {
+            ['group', 'pitch', 'reflect'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                btn.className = 'bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-2 transition';
+            });
+
+            const activeBtn = document.getElementById(`mode-${mode}`);
+            activeBtn.className = 'bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-sm transition';
+
+            if(mode === 'group') timerSeconds = 1200;
+            if(mode === 'pitch') timerSeconds = 480;
+            if(mode === 'reflect') timerSeconds = 120;
+            renderTimer();
+        }
+
+        // Modal Utility
+        function toggleModal(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+        // JSON Export Simulation
+        function exportJSON() {
+            const state = {
+                group: selectedGroupKey,
+                data: groupsData[selectedGroupKey],
+                method: document.getElementById('select-method').value,
+                spec: document.getElementById('input-spec').value,
+                tool: document.getElementById('select-tool').value,
+                factcheck: document.getElementById('text-factcheck').value,
+                adaptation: document.getElementById('text-adaptation').value,
+                reflection: document.getElementById('phrase-box').innerText
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `pedagogy_trainer_topic2_${selectedGroupKey}.json`);
+            dlAnchorElem.click();
+
+            showToast('JSON успішно згенеровано!');
+        }
+
+        // Toast Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
